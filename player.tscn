@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://player.gd" type="Script" id=1]
+[ext_resource path="res://player.png" type="Texture" id=2]
+[ext_resource path="res://arrow.png" type="Texture" id=3]
+
+[sub_resource type="RectangleShape2D" id=4]
+
+custom_solver_bias = 0.0
+extents = Vector2( 7, 7 )
+
+[node name="player" type="KinematicBody2D"]
+
+position = Vector2( 0, -2 )
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+collision/safe_margin = 0.08
+script = ExtResource( 1 )
+_sections_unfolded = [ "Collision" ]
+TestObject = null
+
+[node name="sprite" type="Sprite" parent="." index="0"]
+
+scale = Vector2( 1, 2 )
+texture = ExtResource( 2 )
+_sections_unfolded = [ "Transform", "Z Index" ]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="1"]
+
+position = Vector2( -0.315559, 0.157784 )
+scale = Vector2( 1, 2 )
+shape = SubResource( 4 )
+_sections_unfolded = [ "Transform", "Z Index" ]
+
+[node name="Sprite" type="Sprite" parent="." index="2"]
+
+position = Vector2( 1.00314, 1.08956 )
+scale = Vector2( 0.0823466, 0.169634 )
+texture = ExtResource( 3 )
+
+
