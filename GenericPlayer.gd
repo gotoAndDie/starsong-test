@@ -1,27 +1,33 @@
 extends KinematicBody2D
 
-# This demo shows how to build a kinematic controller.
 
-export (PackedScene) var TestObject
-
-# Member variables
-const GRAVITY = 500.0 # pixels/second/second
-
+# Default physical parameters
+var GRAVITY = 500.0 # pixels/second/second
 # Angle in degrees towards either side that the player can consider "floor"
-const FLOOR_ANGLE_TOLERANCE = 40
-const WALK_FORCE = 600
-const AIR_FORCE = 300
-const WALK_MIN_SPEED = 10
-const WALK_MAX_SPEED = 200
-const STOP_FORCE = 5000
-const AIR_STOP_FORCE = 100
-const JUMP_SPEED = 300
-const DOUBLE_JUMP_SPEED = 200
-const JUMP_GATE_SPEED = 75
+var FLOOR_ANGLE_TOLERANCE = 30
+var WALK_FORCE = 600
+var AIR_FORCE = 300
+
+var WALK_MIN_SPEED = 10
+var WALK_MAX_SPEED = 200
+var AIR_INVERT_FORCE = 500
+
+var STOP_FORCE = 5000
+var AIR_STOP_FORCE = 100
+
+var JUMP_SPEED = 300
+var DOUBLE_JUMP_SPEED = 200
+var JUMP_GATE_SPEED = 75
+var FALL_GATE_SPEED = 300
+var FAST_FALL_GATE_SPEED = 500
+var FAST_FALL_FORCE = 200
+
+var SLIDE_STOP_VELOCITY = 1.0 # one pixel/second
+var SLIDE_STOP_MIN_TRAVEL = 1.0 # one pixel
+
+
 const JUMP_MAX_AIRBORNE_TIME = 0.2
 
-const SLIDE_STOP_VELOCITY = 1.0 # one pixel/second
-const SLIDE_STOP_MIN_TRAVEL = 1.0 # one pixel
 
 var velocity = Vector2(0,0)
 var on_air_time = 100
@@ -46,8 +52,8 @@ var fire  = false
 var storedCollision
 
 # State timers
-var attacking = 0
-var justAttacked = 0
+var attackLagFrame = 0
+var movementLagFrame = 0
 var stun = 0
 var preFly = 0
 var fly = 0
@@ -112,15 +118,21 @@ func _physics_process(delta):
 	var stop = true
 	
 	# Walking  (actually dashing for now)
-	if justAttacked <= 0:
+	if movementLagFrame <= 0:
 		if on_air_time >= JUMP_MAX_AIRBORNE_TIME: # In the air
 			if left:
 				if velocity.x > -WALK_MAX_SPEED:
 					force.x -= AIR_FORCE
 					stop = false
+				if velocity.x > 0: # Trying to stop
+					force.x -= AIR_INVERT_FORCE
+					stop = false
 			elif right:
 				if velocity.x < WALK_MAX_SPEED:
 					force.x += AIR_FORCE
+					stop = false
+				if velocity.x < 0: # Trying to stop
+					force.x += AIR_INVERT_FORCE
 					stop = false
 		else:
 			if left:
@@ -134,15 +146,15 @@ func _physics_process(delta):
 					velocity.x = WALK_MAX_SPEED
 					stop = false
 			
-	else:
-		justAttacked -= delta
+		# Allow reversing direction only when on ground
+		if on_air_time < JUMP_MAX_AIRBORNE_TIME:
+			if left:
+				direction = "left"
+			if right:
+				direction = "right"
 			
-	# Allow reversing direction only when on ground
-	if on_air_time < JUMP_MAX_AIRBORNE_TIME:
-		if left:
-			direction = "left"
-		if right:
-			direction = "right"
+	else:
+		movementLagFrame -= delta
 			
 	if direction == "left":
 		get_node("Sprite").set_flip_h(true)
@@ -163,27 +175,39 @@ func _physics_process(delta):
 		
 		velocity.x = vlen * vsign
 	
+	# Increase gravity when down is held
+	if not is_on_floor() and down:
+		force.y += FAST_FALL_FORCE
 	# Integrate forces to velocity
-	velocity += force * delta	
+	velocity += force * delta
+	
+	# Enforce maximum fall speed
+	if not is_on_floor() and velocity.y > FALL_GATE_SPEED:
+		velocity.y = FALL_GATE_SPEED
+		if down:
+			velocity.y = FAST_FALL_GATE_SPEED
+		
 	# Integrate velocity into motion and move
 	velocity = move_and_slide(velocity, Vector2(0, -1))
 	
 	
 	
-	if is_on_floor():
-		on_air_time = 0
+	if is_on_floor() && on_air_time >= JUMP_MAX_AIRBORNE_TIME:
 		double_jumping = false
 		dejumping = false
 		touch_ground()
+
+	if is_on_floor():
+		on_air_time = 0
 		
 	if on_air_time >= JUMP_MAX_AIRBORNE_TIME:
 		# Air state
 		# Handle jumping
-		if jump and not prev_jump_pressed:
+		if jump and not prev_jump_pressed and movementLagFrame <= 0:
 			air_jump()
 		
 		# Handle attacking
-		if attacking <= 0 and fire:
+		if attackLagFrame <= 0 and fire:
 			if left or right:
 				air_side()
 			elif up:
@@ -192,16 +216,16 @@ func _physics_process(delta):
 				air_down()
 			else:
 				air_neutral()
-		if attacking > 0:
-			attacking -= delta
+		if attackLagFrame > 0:
+			attackLagFrame -= delta
 	else:
 		# Ground state
 		# Handle jumping
-		if jump and not prev_jump_pressed:
+		if jump and not prev_jump_pressed and movementLagFrame <= 0:
 			ground_jump()
 		
 		# Handle attacking
-		if attacking <= 0 and fire:
+		if attackLagFrame <= 0 and fire:
 			if left or right:
 				ground_side()
 			elif up:
@@ -210,8 +234,8 @@ func _physics_process(delta):
 				ground_down()
 			else:
 				ground_neutral()
-		if attacking > 0:
-			attacking -= delta
+		if attackLagFrame > 0:
+			attackLagFrame -= delta
 	
 	if jumping and velocity.y > 0:
 		# If falling, no longer jumping

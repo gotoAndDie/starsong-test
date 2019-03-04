@@ -30,10 +30,28 @@ extents = Vector2( 8, 8 )
 "shape_transform": Transform2D( 1, 0, 0, 1, 8, 8 )
 } ]
 
-[sub_resource type="RectangleShape2D" id=4]
+[sub_resource type="RectangleShape2D" id=3]
 
 custom_solver_bias = 0.0
 extents = Vector2( 8, 8 )
+
+[sub_resource type="Animation" id=4]
+
+length = 10.0
+loop = true
+step = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1, 5, 6 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 184, 152 ), Vector2( 184, 152 ), Vector2( 328.086, 152 ), Vector2( 328.086, 152 ) ]
+}
 
 [sub_resource type="Animation" id=5]
 
@@ -68,43 +86,25 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 1, 5, 6 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Vector2( 184, 152 ), Vector2( 184, 152 ), Vector2( 328.086, 152 ), Vector2( 328.086, 152 ) ]
-}
-
-[sub_resource type="Animation" id=7]
-
-length = 10.0
-loop = true
-step = 0.1
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 1, 5, 6 ),
-"transitions": PoolRealArray( 1, 1, 1, 1 ),
-"update": 0,
 "values": [ Vector2( 88.3493, 296 ), Vector2( 88.3493, 296 ), Vector2( 88.3493, 152 ), Vector2( 88.3493, 152 ) ]
 }
 
-[sub_resource type="RectangleShape2D" id=8]
+[sub_resource type="RectangleShape2D" id=7]
 
 custom_solver_bias = 0.0
 extents = Vector2( 8, 8 )
 
-[sub_resource type="RectangleShape2D" id=9]
+[sub_resource type="RectangleShape2D" id=8]
 
 custom_solver_bias = 0.0
 extents = Vector2( 10, 4 )
 
-[sub_resource type="CircleShape2D" id=10]
+[sub_resource type="CircleShape2D" id=9]
 
 custom_solver_bias = 0.0
 radius = 32.0
 
-[sub_resource type="Animation" id=11]
+[sub_resource type="Animation" id=10]
 
 length = 20.0
 loop = true
@@ -122,12 +122,12 @@ tracks/0/keys = {
 "values": [ 0.0, 90.0, 0.0, -90.0 ]
 }
 
-[sub_resource type="RectangleShape2D" id=12]
+[sub_resource type="RectangleShape2D" id=11]
 
 custom_solver_bias = 0.0
 extents = Vector2( 8, 8 )
 
-[sub_resource type="RectangleShape2D" id=13]
+[sub_resource type="RectangleShape2D" id=12]
 
 custom_solver_bias = 0.0
 extents = Vector2( 32, 8 )
@@ -182,7 +182,7 @@ _sections_unfolded = [ "Collision" ]
 
 [node name="collision" type="CollisionShape2D" parent="moving_platform1" index="0"]
 
-shape = SubResource( 4 )
+shape = SubResource( 3 )
 
 [node name="sprite" type="Sprite" parent="moving_platform1" index="1"]
 
@@ -195,7 +195,7 @@ autoplay = "leftright"
 playback_process_mode = 0
 playback_default_blend_time = 0.0
 playback_speed = 1.0
-anims/leftright = SubResource( 5 )
+anims/leftright = SubResource( 4 )
 blend_times = [  ]
 
 [node name="moving_platform2" type="KinematicBody2D" parent="." index="4"]
@@ -210,7 +210,7 @@ _sections_unfolded = [ "Collision" ]
 
 [node name="collision" type="CollisionShape2D" parent="moving_platform2" index="0"]
 
-shape = SubResource( 4 )
+shape = SubResource( 3 )
 
 [node name="sprite" type="Sprite" parent="moving_platform2" index="1"]
 
@@ -223,8 +223,8 @@ autoplay = "updown"
 playback_process_mode = 0
 playback_default_blend_time = 0.0
 playback_speed = 1.0
-anims/leftright = SubResource( 6 )
-anims/updown = SubResource( 7 )
+anims/leftright = SubResource( 5 )
+anims/updown = SubResource( 6 )
 blend_times = [  ]
 
 [node name="princess" type="Area2D" parent="." index="5"]
@@ -241,7 +241,7 @@ audio_bus_name = "Master"
 
 [node name="collision" type="CollisionShape2D" parent="princess" index="0"]
 
-shape = SubResource( 8 )
+shape = SubResource( 7 )
 _sections_unfolded = [ "Pause" ]
 
 [node name="Sprite" type="Sprite" parent="princess" index="1"]
@@ -288,7 +288,7 @@ texture = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="oneway1" index="1"]
 
-shape = SubResource( 9 )
+shape = SubResource( 8 )
 one_way_collision = true
 
 [node name="oneway2" type="KinematicBody2D" parent="." index="8"]
@@ -308,7 +308,7 @@ texture = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="oneway2" index="1"]
 
-shape = SubResource( 9 )
+shape = SubResource( 8 )
 one_way_collision = true
 
 [node name="oneway3" type="KinematicBody2D" parent="." index="9"]
@@ -328,7 +328,7 @@ texture = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="oneway3" index="1"]
 
-shape = SubResource( 9 )
+shape = SubResource( 8 )
 one_way_collision = true
 
 [node name="oneway4" type="KinematicBody2D" parent="." index="10"]
@@ -348,7 +348,7 @@ texture = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="oneway4" index="1"]
 
-shape = SubResource( 9 )
+shape = SubResource( 8 )
 one_way_collision = true
 
 [node name="circle" type="KinematicBody2D" parent="." index="11"]
@@ -367,7 +367,7 @@ texture = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="circle" index="1"]
 
-shape = SubResource( 10 )
+shape = SubResource( 9 )
 
 [node name="anim" type="AnimationPlayer" parent="circle" index="2"]
 
@@ -376,13 +376,13 @@ autoplay = "turn"
 playback_process_mode = 1
 playback_default_blend_time = 0.0
 playback_speed = 1.0
-anims/turn = SubResource( 11 )
+anims/turn = SubResource( 10 )
 blend_times = [  ]
 
 [node name="box" type="CollisionShape2D" parent="circle" index="3"]
 
 position = Vector2( -0.440125, -37.0904 )
-shape = SubResource( 12 )
+shape = SubResource( 11 )
 
 [node name="boxsprite" type="Sprite" parent="circle" index="4"]
 
@@ -408,7 +408,7 @@ texture = ExtResource( 7 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform" index="1"]
 
-shape = SubResource( 13 )
+shape = SubResource( 12 )
 
 [node name="platform1" type="StaticBody2D" parent="." index="13"]
 
@@ -429,7 +429,7 @@ texture = ExtResource( 7 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform1" index="1"]
 
-shape = SubResource( 13 )
+shape = SubResource( 12 )
 
 [connection signal="body_entered" from="princess" to="." method="_on_princess_body_enter"]
 
