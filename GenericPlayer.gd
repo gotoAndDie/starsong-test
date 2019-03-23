@@ -35,6 +35,8 @@ var jumping = false
 var try_double_jumping = false
 var double_jumping = false
 var dejumping = false
+var fast_fall_on = false
+var freeFall = false
 
 var prev_jump_pressed = false
 var prev_up = false
@@ -42,12 +44,13 @@ var attackObj
 var direction = "right"
 var origPos = Vector2(-1,-1)
 
-var left  = false
-var right = false
-var up    = false
+var left    = false
+var right   = false
+var up      = false
 var down    = false
-var jump  = false 
-var fire  = false
+var jump    = false 
+var fire    = false
+var special = false
 
 var storedCollision
 
@@ -79,6 +82,9 @@ func _init():
 	
 func starInit():
 	print("Default player initialization")
+	
+func getInput():
+	print("Error! getInput not overridden!")
 
 func _physics_process(delta):
 	# Create forces
@@ -176,13 +182,13 @@ func _physics_process(delta):
 		velocity.x = vlen * vsign
 	
 	# Increase gravity when down is held
-	if not is_on_floor() and down:
-		force.y += FAST_FALL_FORCE
+	if not is_on_floor() and down and (fast_fall_on or freeFall):
+		velocity.y = FAST_FALL_GATE_SPEED
 	# Integrate forces to velocity
 	velocity += force * delta
 	
 	# Enforce maximum fall speed
-	if not is_on_floor() and velocity.y > FALL_GATE_SPEED:
+	if not is_on_floor() and velocity.y > FALL_GATE_SPEED and fast_fall_on:
 		velocity.y = FALL_GATE_SPEED
 		if down:
 			velocity.y = FAST_FALL_GATE_SPEED
@@ -195,6 +201,8 @@ func _physics_process(delta):
 	if is_on_floor() && on_air_time >= JUMP_MAX_AIRBORNE_TIME:
 		double_jumping = false
 		dejumping = false
+		fast_fall_on = false
+		freeFall = false
 		touch_ground()
 
 	if is_on_floor():
@@ -203,11 +211,12 @@ func _physics_process(delta):
 	if on_air_time >= JUMP_MAX_AIRBORNE_TIME:
 		# Air state
 		# Handle jumping
-		if jump and not prev_jump_pressed and movementLagFrame <= 0:
+		if jump and not prev_jump_pressed and movementLagFrame <= 0 and !freeFall:
+			print("um")
 			air_jump()
 		
 		# Handle attacking
-		if attackLagFrame <= 0 and fire:
+		if attackLagFrame <= 0 and fire and !freeFall:
 			if left or right:
 				air_side()
 			elif up:
@@ -248,13 +257,14 @@ func _physics_process(delta):
 	on_air_time += delta
 	prev_jump_pressed = jump
 
-func hit(origin, type, damage, direction, force, hitStun, flyStun):
+func hit(origin, type, attackProperty:AttackProperty):
 	print(type)
-	stun += hitStun
-	damagePercent += damage
-	flyDirection = direction
-	flySpeed = force
-	preFly = flyStun
+	stun += attackProperty.stun
+	damagePercent += attackProperty.damage
+	flyDirection = attackProperty.direction
+	flySpeed = attackProperty.force
+	preFly = attackProperty.flyStun
+	freeFall = false
 	
 func out():
 	print("out")

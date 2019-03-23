@@ -4,15 +4,17 @@ var remain = 0
 var theCollision
 var direction
 var hitslist = []
+var attackProperty
 
 func _init():
 	connect("body_entered", self, "collision")
 
-func start(disp):
+func start(dispx, dispy, attackProperty : AttackProperty, duration):
 	print("Sword generated")
-	direction = disp
-	position = Vector2(disp,0)
-	remain = 0.3
+	self.direction = dispx
+	self.attackProperty = attackProperty
+	position = Vector2(dispx,dispy)
+	remain = duration
 
 func _physics_process(delta):
 	if remain <= 0:
@@ -28,7 +30,7 @@ func collision(body):
 	# origin, type, damage, direction, force, stun, flystun
 	if hitslist.find(body) == -1 && body.has_method("hit") && body != get_parent():
 		if direction > 0: # right
-			body.hit(get_parent(), "sword", 5, 45, 200, 0.1, 0.1)
+			body.hit(get_parent(), "sword", attackProperty)
 		else: #left
-			body.hit(get_parent(), "sword", 5, -45, 200, 0.1, 0.1)
+			body.hit(get_parent(), "sword", attackProperty.invert())
 	hitslist.append(body)

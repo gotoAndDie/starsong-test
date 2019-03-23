@@ -7,6 +7,7 @@ func getInput():
 	right = Input.is_action_pressed("move_right")
 	jump = Input.is_action_pressed("jump")
 	fire = Input.is_action_pressed("fire")
+	special = Input.is_action_pressed("special")
 	up = Input.is_action_pressed("move_up")
 	down = Input.is_action_pressed("move_down")
 

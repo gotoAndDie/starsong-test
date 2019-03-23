@@ -7,11 +7,12 @@ func getInput():
 	right = Input.is_action_pressed("move_right_2")
 	jump = Input.is_action_pressed("jump_2")
 	fire = Input.is_action_pressed("fire_2")
-	up = Input.is_action_pressed("move_up")
-	down = Input.is_action_pressed("move_down")
+	special = Input.is_action_pressed("special_2")
+	up = Input.is_action_pressed("move_up_2")
+	down = Input.is_action_pressed("move_down_2")
 	
 func starInit():
-	star = load("res://Stars/" + Globals.star_p1 + ".gd").new()
+	star = load("res://Stars/" + Globals.star_p2 + ".gd").new()
 	star.starInit(self)
 
 func ground_neutral():
