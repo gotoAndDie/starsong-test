@@ -1,12 +1,14 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Stages/MorningStar.gd" type="Script" id=1]
 [ext_resource path="res://obstacle.png" type="Texture" id=2]
 [ext_resource path="res://player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://player2.gd" type="Script" id=4]
-[ext_resource path="res://long_obstacle.png" type="Texture" id=5]
-[ext_resource path="res://camera.gd" type="Script" id=6]
-[ext_resource path="res://ValidZone.gd" type="Script" id=7]
+[ext_resource path="res://ValidZone.gd" type="Script" id=5]
+[ext_resource path="res://long_obstacle.png" type="Texture" id=6]
+[ext_resource path="res://circle.png" type="Texture" id=7]
+[ext_resource path="res://camera.gd" type="Script" id=8]
+[ext_resource path="res://Objects/TestCurve.tscn" type="PackedScene" id=9]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 8 )
@@ -29,10 +31,12 @@ extents = Vector2( 8, 8 )
 } ]
 0/z_index = 0
 
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 32, 8 )
-
 [sub_resource type="RectangleShape2D" id=4]
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 32, 7.54646 )
+
+[sub_resource type="CircleShape2D" id=5]
 
 [node name="colworld" type="Node2D"]
 script = ExtResource( 1 )
@@ -46,15 +50,13 @@ format = 1
 tile_data = PoolIntArray( 1310732, 0, 0, 1310733, 0, 0, 1310734, 0, 0, 1310735, 0, 0, 1310736, 0, 0, 1310737, 0, 0, 1310738, 0, 0, 1310739, 0, 0, 1310740, 0, 0, 1310741, 0, 0, 1310742, 0, 0, 1310743, 0, 0, 1310744, 0, 0, 1310745, 0, 0, 1310746, 0, 0, 1310747, 0, 0, 1310748, 0, 0, 1310749, 0, 0, 1310750, 0, 0, 1310751, 0, 0, 1310752, 0, 0, 1310753, 0, 0, 1310754, 0, 0, 1310755, 0, 0, 1310756, 0, 0, 1310757, 0, 0, 1310758, 0, 0, 1310759, 0, 0, 1310760, 0, 0, 1310761, 0, 0, 1310762, 0, 0, 1310763, 0, 0, 1310764, 0, 0, 1310765, 0, 0, 1310766, 0, 0, 1310767, 0, 0, 1376269, 0, 0, 1376302, 0, 0, 1441805, 0, 0, 1441806, 0, 0, 1441837, 0, 0, 1441838, 0, 0, 1507342, 0, 0, 1507373, 0, 0, 1572878, 0, 0, 1572879, 0, 0, 1572908, 0, 0, 1572909, 0, 0, 1638415, 0, 0, 1638416, 0, 0, 1638443, 0, 0, 1638444, 0, 0, 1703952, 0, 0, 1703953, 0, 0, 1703954, 0, 0, 1703955, 0, 0, 1703956, 0, 0, 1703957, 0, 0, 1703958, 0, 0, 1703959, 0, 0, 1703960, 0, 0, 1703961, 0, 0, 1703962, 0, 0, 1703963, 0, 0, 1703964, 0, 0, 1703965, 0, 0, 1703966, 0, 0, 1703967, 0, 0, 1703968, 0, 0, 1703969, 0, 0, 1703970, 0, 0, 1703971, 0, 0, 1703972, 0, 0, 1703973, 0, 0, 1703974, 0, 0, 1703975, 0, 0, 1703976, 0, 0, 1703977, 0, 0, 1703978, 0, 0, 1703979, 0, 0 )
 
 [node name="player" parent="." instance=ExtResource( 3 )]
-position = Vector2( 264.299, 300.272 )
-_sections_unfolded = [ "Collision", "Pause", "Transform", "Z Index", "collision" ]
+position = Vector2( 333.398, 248.08 )
 
 [node name="player2" parent="." instance=ExtResource( 3 )]
-position = Vector2( 665.185, 299.127 )
+position = Vector2( 656.364, 141.817 )
 collision_layer = 2
 collision_mask = 2
 script = ExtResource( 4 )
-_sections_unfolded = [ "Collision", "Pause", "Transform", "Z Index", "collision" ]
 
 [node name="youwin" type="Label" parent="."]
 visible = false
@@ -68,6 +70,16 @@ text = "Thank You Cubio
 You Saved The Princess!"
 align = 1
 
+[node name="ValidZone" type="Area2D" parent="."]
+visible = false
+collision_layer = 31
+script = ExtResource( 5 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ValidZone"]
+position = Vector2( 497.88, 234.016 )
+scale = Vector2( 63.5056, 38.3669 )
+shape = SubResource( 4 )
+
 [node name="platform" type="StaticBody2D" parent="."]
 position = Vector2( 214.781, 368.442 )
 rotation = -1.99975
@@ -75,9 +87,32 @@ scale = Vector2( 1.2047, 0.977026 )
 collision_layer = 31
 
 [node name="sprite" type="Sprite" parent="platform"]
-texture = ExtResource( 5 )
+texture = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform"]
+shape = SubResource( 3 )
+
+[node name="platform8" type="StaticBody2D" parent="."]
+position = Vector2( 796.709, 177.265 )
+rotation = -1.5708
+scale = Vector2( 5, 0.977 )
+collision_layer = 31
+
+[node name="sprite" type="Sprite" parent="platform8"]
+texture = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="platform8"]
+shape = SubResource( 3 )
+
+[node name="platform9" type="StaticBody2D" parent="."]
+position = Vector2( 654.366, 187.609 )
+scale = Vector2( 1.2047, 0.977026 )
+collision_layer = 31
+
+[node name="sprite" type="Sprite" parent="platform9"]
+texture = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="platform9"]
 shape = SubResource( 3 )
 
 [node name="platform4" type="StaticBody2D" parent="."]
@@ -87,7 +122,7 @@ scale = Vector2( 1.2047, 0.977026 )
 collision_layer = 31
 
 [node name="sprite" type="Sprite" parent="platform4"]
-texture = ExtResource( 5 )
+texture = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform4"]
 shape = SubResource( 3 )
@@ -99,10 +134,47 @@ scale = Vector2( 0.695975, 0.977026 )
 collision_layer = 31
 
 [node name="sprite" type="Sprite" parent="platform2"]
-texture = ExtResource( 5 )
+texture = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform2"]
 shape = SubResource( 3 )
+
+[node name="platform5" type="StaticBody2D" parent="."]
+position = Vector2( 331.985, 304.152 )
+rotation = 0.279253
+scale = Vector2( 30, 0.977 )
+collision_layer = 31
+
+[node name="sprite" type="Sprite" parent="platform5"]
+texture = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="platform5"]
+shape = SubResource( 3 )
+
+[node name="platform6" type="StaticBody2D" parent="."]
+position = Vector2( 719.777, 323.147 )
+rotation = -0.261799
+scale = Vector2( 0.695975, 0.977026 )
+collision_layer = 31
+
+[node name="sprite" type="Sprite" parent="platform6"]
+texture = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="platform6"]
+shape = SubResource( 3 )
+
+[node name="platform7" type="StaticBody2D" parent="."]
+position = Vector2( 476.899, 181.13 )
+rotation = -0.261799
+scale = Vector2( 3, 3 )
+collision_layer = 31
+
+[node name="sprite" type="Sprite" parent="platform7"]
+texture = ExtResource( 7 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="platform7"]
+scale = Vector2( 3, 3 )
+shape = SubResource( 5 )
 
 [node name="platform3" type="StaticBody2D" parent="."]
 position = Vector2( 713.425, 413.475 )
@@ -111,7 +183,7 @@ scale = Vector2( 0.695976, 0.977026 )
 collision_layer = 31
 
 [node name="sprite" type="Sprite" parent="platform3"]
-texture = ExtResource( 5 )
+texture = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="platform3"]
 shape = SubResource( 3 )
@@ -119,14 +191,7 @@ shape = SubResource( 3 )
 [node name="camera" type="Camera2D" parent="."]
 position = Vector2( 480.221, 271.88 )
 zoom = Vector2( 0.5, 0.5 )
-script = ExtResource( 6 )
+script = ExtResource( 8 )
 
-[node name="ValidZone" type="Area2D" parent="."]
-collision_layer = 31
-script = ExtResource( 7 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ValidZone"]
-position = Vector2( 497.88, 234.016 )
-scale = Vector2( 63.5056, 38.3669 )
-shape = SubResource( 4 )
-
+[node name="Node2D" parent="." instance=ExtResource( 9 )]
+position = Vector2( -1, 22 )

@@ -4,39 +4,29 @@
 [ext_resource path="res://player.png" type="Texture" id=2]
 [ext_resource path="res://arrow.png" type="Texture" id=3]
 
-[sub_resource type="RectangleShape2D" id=4]
-
-custom_solver_bias = 0.0
+[sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 7, 7 )
 
 [node name="player" type="KinematicBody2D"]
-
 position = Vector2( 0, -2 )
-input_pickable = false
-collision_layer = 1
-collision_mask = 1
-collision/safe_margin = 0.08
 script = ExtResource( 1 )
-_sections_unfolded = [ "Collision" ]
-TestObject = null
 
-[node name="sprite" type="Sprite" parent="." index="0"]
-
+[node name="sprite" type="Sprite" parent="."]
 scale = Vector2( 1, 2 )
 texture = ExtResource( 2 )
-_sections_unfolded = [ "Transform", "Z Index" ]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="1"]
-
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -0.315559, 0.157784 )
 scale = Vector2( 1, 2 )
-shape = SubResource( 4 )
-_sections_unfolded = [ "Transform", "Z Index" ]
+shape = SubResource( 1 )
 
-[node name="Sprite" type="Sprite" parent="." index="2"]
-
+[node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 1.00314, 1.08956 )
 scale = Vector2( 0.0823466, 0.169634 )
 texture = ExtResource( 3 )
 
-
+[node name="DEBUG" type="RichTextLabel" parent="."]
+margin_left = -103.047
+margin_top = -90.8587
+margin_right = 749.953
+margin_bottom = 58.1413

@@ -14,6 +14,7 @@ func getInput():
 func starInit():
 	star = load("res://Stars/" + Globals.star_p2 + ".gd").new()
 	star.starInit(self)
+	#rotation = -20
 
 func ground_neutral():
 	star.ground_neutral(self)
