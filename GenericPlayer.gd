@@ -1,10 +1,10 @@
 extends KinematicBody2D
 
+class_name GenericPlayer
 
 # Default physical parameters
 var GRAVITY = 500.0 # pixels/second/second
 # Angle in degrees towards either side that the player can consider "floor"
-var FLOOR_ANGLE_TOLERANCE = 180
 var WALK_FORCE = 1200
 var AIR_FORCE = 300
 
@@ -43,21 +43,27 @@ var fast_fall_on = false
 var freeFall = false
 
 var prev_jump_pressed = false
-var prev_up = false
+var prev_attack_pressed = false
+var prev_special_pressed = false
+
 var attackObj
-var direction = "right"
+var direction = "right" # Direction character is facing, left or right
 var origPos = Vector2(-1,-1)
 
 # Button presses
-var left     = false
-var right    = false
-var up       = false
-var down     = false
-var jump     = false 
-var fire     = false
-var special  = false
-var x_factor = 0.0
-var theta    = -1       # Angle of joystick
+var left       = false
+var right      = false
+var up         = false
+var down       = false
+var jump       = false 
+var attack     = false
+var special    = false
+var switch     = false
+var x_factor   = 0.0
+var joy_l_theta     = -1       # Angle of joystick
+var joy_r_theta     = -1
+var joy_l_magnitude = 0
+var joy_r_magnitude = 0
 
 var storedCollision
 
@@ -75,14 +81,6 @@ var flyDirection = 0
 var flySpeed = 0
 
 onready var sprite = get_node("sprite")
-
-func attack():
-	attackObj = get_node("TestObject")
-	if Input.is_action_pressed("move_left"):
-		attackObj.start(-10)
-	if Input.is_action_pressed("move_right"):
-		attackObj.start(10)
-		
 	
 func _init():
 	starInit()
@@ -134,7 +132,7 @@ func _physics_process(delta):
 		return
 	var stop = true
 	
-	# Walking  (actually dashing for now)
+	# Horizontal movement
 	if movementLagFrame <= 0:
 		if !is_on_floor(): # In the air
 			if left:
@@ -194,18 +192,18 @@ func _physics_process(delta):
 		velocity = derot_velocity.rotated(rotation)
 	
 	# Set player angle according to ground
-	var collision = get_slide_collision(0)
-	if collision != null:
-		standing_normal = collision.get_normal().normalized()
+	if get_slide_count() > 0:
+		var collision = get_slide_collision(0)
 		var angle = collision.get_normal().angle() + 0.5 * PI
 		
 		# Do not rotate and reset rotation if you're too slow (and on a steep surface)
 		if abs(derot_velocity.x) < 100 && is_on_floor() && Globals.angle_to_angle(angle, 0) < 0.5*PI:
 			rotation = 0
-			pass
+			standing_normal = Vector2(0,1)
 			
 		if Globals.angle_to_angle(angle, rotation) < 0.2 * PI || Globals.angle_to_angle(angle, 0) < 0.1*PI:
 			rotation = angle
+			standing_normal = collision.get_normal().normalized()
 		rotated_air_time = ROTATION_MAX_AIRBORNE_TIME
 		
 			
@@ -249,6 +247,7 @@ func _physics_process(delta):
 	if is_on_floor():
 		on_air_time = 0
 		
+	# Handle groun and air attacks
 	if on_air_time >= JUMP_MAX_AIRBORNE_TIME:
 		# Air state
 		# Handle jumping
@@ -256,17 +255,11 @@ func _physics_process(delta):
 			air_jump()
 		
 		# Handle attacking
-		if attackLagFrame <= 0 and fire and !freeFall:
-			if left or right:
-				air_side()
-			elif up:
-				air_up()
-			elif down:
-				air_down()
-			else:
-				air_neutral()
-		if attackLagFrame > 0:
-			attackLagFrame -= delta
+		if attack and not prev_attack_pressed and !freeFall:
+			air_normal()
+			
+		if special and not prev_special_pressed and !freeFall:
+			air_special()
 	else:
 		# Ground state
 		# Handle jumping
@@ -274,17 +267,14 @@ func _physics_process(delta):
 			ground_jump()
 		
 		# Handle attacking
-		if attackLagFrame <= 0 and fire:
-			if left or right:
-				ground_side()
-			elif up:
-				ground_up()
-			elif down:
-				ground_down()
-			else:
-				ground_neutral()
-		if attackLagFrame > 0:
-			attackLagFrame -= delta
+		if attack and not prev_attack_pressed:
+			ground_normal()
+			
+		if special and not prev_special_pressed:
+			ground_special()
+			
+	prev_attack_pressed = attack
+	prev_special_pressed = special
 	
 	if jumping and velocity.y > 0:
 		# If falling, no longer jumping
@@ -296,8 +286,27 @@ func _physics_process(delta):
 	
 	on_air_time += delta
 	prev_jump_pressed = jump
+	
+	
+	# Run any other operations injected by the specific character
+	# Such as handling attack lag
+	loop_inject(delta)
+	
+	# Handle 
+	if hitProperty != null:
+		if hitProperty.delayFrames > 0:
+			hitProperty.delayFrames -= delta
+		else:
+			procHit(hitType, hitProperty)
+			hitProperty = null
 
+var hitType = null
+var hitProperty = null
 func hit(origin, type, attackProperty:AttackProperty):
+	hitType = type
+	hitProperty = attackProperty
+	
+func procHit(type, attackProperty:AttackProperty):
 	print(type)
 	stun += attackProperty.stun
 	damagePercent += attackProperty.damage
@@ -305,34 +314,32 @@ func hit(origin, type, attackProperty:AttackProperty):
 	flySpeed = attackProperty.force
 	preFly = attackProperty.flyStun
 	freeFall = false
+func launch():
+	pass
 	
 func out():
 	print("out")
 	position = get_parent().initPos
 	velocity = Vector2(0,0)
 
-func ground_neutral():
-	print("Error: player did not override ground_neutral!")
-func ground_side():
-	print("Error: player did not override ground_side!")
-func ground_up():
-	print("Error: player did not override ground_up!")
-func ground_down():
-	print("Error: player did not override ground_down!")
+func ground_normal():
+	print("Error: player did not override ground_normal!")
+func ground_special():
+	print("Error: player did not override ground_special!")
 func ground_jump():
 	print("Error: player did not override ground_jump!")
 	
-func air_neutral():
-	print("Error: player did not override air_neutral!")
-func air_side():
-	print("Error: player did not override air_side!")
-func air_up():
-	print("Error: player did not override air_up!")
-func air_down():
-	print("Error: player did not override air_down!")
+
+func air_normal():
+	print("Error: player did not override air_normal!")
+func air_special():
+	print("Error: player did not override air_special!")
 func air_jump():
 	print("Error: player did not override air_jump!")
 	
 	
 func touch_ground():
 	print("Error: player did not override touch_ground!")
+	
+func loop_inject(delta):
+	pass

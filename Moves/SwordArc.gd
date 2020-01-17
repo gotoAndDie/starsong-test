@@ -16,6 +16,10 @@ func start(dispx, dispy, attackProperty : AttackProperty, duration):
 	position = Vector2(dispx,dispy)
 	remain = duration
 
+func setScale(scalex, scaley):
+	$SwordArcCollision.scale = Vector2(scalex, scaley)
+	$SwordArcSprite.scale = Vector2(scalex / 2.0, scaley / 2.0) # Adjusted for default scale of 0.5
+
 func _physics_process(delta):
 	if remain <= 0:
 		position = Vector2(9999,9999)
